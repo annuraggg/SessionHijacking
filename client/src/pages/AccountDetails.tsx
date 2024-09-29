@@ -1,3 +1,4 @@
+import { Edit } from "lucide-react";
 import { useState } from "react";
 import {
   FaUser,
@@ -6,6 +7,15 @@ import {
   FaPhone,
   FaChartLine,
 } from "react-icons/fa";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import axios from "axios";
+import { toast } from "sonner";
 
 interface User {
   username: string;
@@ -38,6 +48,10 @@ const AccountDetails = ({
   setSignedIn: (signedIn: boolean) => void;
 }) => {
   const [showBalance, setShowBalance] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
+  const [email, setEmail] = useState(user.contact.email);
+  const [phone, setPhone] = useState(user.contact.phone);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString(undefined, {
@@ -61,11 +75,28 @@ const AccountDetails = ({
     setSignedIn(false);
   };
 
+  const saveContact = () => {
+    setEditOpen(false);
+    const userCopy = { ...user };
+    userCopy.contact.email = email;
+    userCopy.contact.phone = phone;
+
+    axios
+      .post("http://localhost:5000/auth/update-contact", { user: userCopy })
+      .then(() => {
+        toast.success("Contact updated successfully");
+      })
+      .catch((err) => {
+        toast.error("Failed to update contact");
+        console.log(err);
+      });
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <header className="bg-blue-800 text-white p-4">
-          <h1 className="text-2xl font-semibold">Maharashtra Masti Bank</h1>
+          <h1 className="text-2xl font-semibold">Bhai Ka Bank</h1>
           <p className="text-sm">Welcome, {user.username}</p>
         </header>
 
@@ -212,14 +243,24 @@ const AccountDetails = ({
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-4 text-gray-700">
-              Contact Information
-            </h2>
+            <div className="flex gap-3 items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-700">
+                Contact Information
+              </h2>
+              <Edit
+                size={16}
+                className="hover:text-lime-700 transition-colors cursor-pointer"
+                onClick={() => setEditOpen(true)}
+              />
+            </div>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center">
                 <FaEnvelope className="mr-2 text-blue-600" />
                 <span className="font-medium">Email:</span>
-                <span className="ml-2">{user.contact.email}</span>
+                <span
+                  className="ml-2"
+                  dangerouslySetInnerHTML={{ __html: user.contact.email }}
+                ></span>
               </li>
               <li className="flex items-center">
                 <FaPhone className="mr-2 text-blue-600" />
@@ -231,7 +272,7 @@ const AccountDetails = ({
         </main>
 
         <footer className="bg-gray-200 p-4 text-center text-sm text-gray-600">
-          <p>&copy; 2024 Maharashtra Masti Bank. All rights reserved.</p>
+          <p>&copy; 2024 Bhai Ka Bank. All rights reserved.</p>
           <div className="mt-2">
             <a href="#" className="text-blue-600 hover:underline mx-2">
               Privacy Policy
@@ -245,6 +286,39 @@ const AccountDetails = ({
           </div>
         </footer>
       </div>
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Contact</DialogTitle>
+            <DialogDescription>
+              Update your email and phone number.
+              <br />
+              <br />
+              <input
+                type="text"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <input
+                type="text"
+                placeholder="Phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full pl-4 mt-5 pr-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <button
+                className="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition-colors duration-300 mt-4"
+                onClick={saveContact}
+              >
+                Update
+              </button>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

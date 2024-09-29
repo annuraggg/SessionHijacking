@@ -5,5 +5,6 @@ const router = express.Router();
 
 router.post("/login", authController.login);
 router.post("/check-session", authController.checkSession);
+router.post("/update-contact", authController.updateContact);
 
 export default router;

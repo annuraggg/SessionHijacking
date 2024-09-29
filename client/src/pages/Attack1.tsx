@@ -46,6 +46,7 @@ const Attack1 = () => {
       .then((res) => {
         setUser(res.data);
         setLoggedIn(true);
+        localStorage.setItem("username", res.data.username);
       });
   }, []);
 
@@ -61,7 +62,10 @@ const Attack1 = () => {
         sessionId,
       })
       .then((res) => {
-        localStorage.setItem("sessionId", res.data.sessionId);
+        console.log(res.data);
+        localStorage.setItem("sessionId", sessionId);
+        localStorage.setItem("username", res.data.user.username);
+        setUser(res.data.user);
         toast.success("Logged in successfully");
         setLoggedIn(true);
       })
@@ -77,7 +81,7 @@ const Attack1 = () => {
         <header className="bg-blue-800 text-white p-4">
           <div className="max-w-6xl mx-auto flex items-center">
             <FaUniversity className="text-3xl mr-2" />
-            <h1 className="text-2xl font-semibold">Maharashtra Masti Bank</h1>
+            <h1 className="text-2xl font-semibold">Bhai Ka Bank</h1>
           </div>
         </header>
 
@@ -127,7 +131,7 @@ const Attack1 = () => {
         </main>
 
         <footer className="bg-gray-200 p-4 text-center text-sm text-gray-600">
-          <p>&copy; 2024 Maharashtra Masti Bank. All rights reserved.</p>
+          <p>&copy; 2024 Bhai Ka Bank. All rights reserved.</p>
           <div className="mt-2">
             <a href="#" className="text-blue-600 hover:underline mx-2">
               Privacy Policy
@@ -142,7 +146,7 @@ const Attack1 = () => {
         </footer>
       </div>
     );
- 
+
   return <AccountDetails user={user} setSignedIn={setLoggedIn} />;
 };
 

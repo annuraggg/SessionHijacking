@@ -8,7 +8,7 @@ const login = async (req, res) => {
     if (user) {
       user.activeSessions.push(sessionId);
       await user.save();
-      return res.json({ message: "Logged in successfully", sessionId });
+      return res.json({ message: "Logged in successfully", user });
     } else {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -33,4 +33,18 @@ const checkSession = async (req, res) => {
   }
 };
 
-export default { login, checkSession };
+const updateContact = async (req, res) => {
+  const { user } = req.body;
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { username: user.username },
+      user
+    );
+    return res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export default { login, checkSession, updateContact };
